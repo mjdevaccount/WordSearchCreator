@@ -128,5 +128,33 @@ namespace WordSearch.Engine.Tests
 
             Assert.Equal(5, filledCells);
         }
+
+        [Fact]
+        public void AddWord_Horizontal_PlacesWordLeftToRight()
+        {
+            var grid = new WordSearchGrid(10);
+            var generator = new WordSearchGenerator(grid);
+
+            generator.AddWord("HELLO", EDirection.Horizonal);
+
+            var word = grid.IncludedWords[0];
+            Assert.Equal(EDirection.Horizonal, word.Direction);
+            Assert.Equal('H', grid.Grid[word.StartPosition.Row, word.StartPosition.Col]);
+            Assert.Equal('O', grid.Grid[word.StartPosition.Row, word.StartPosition.Col + 4]);
+        }
+
+        [Fact]
+        public void AddWord_Vertical_PlacesWordTopToBottom()
+        {
+            var grid = new WordSearchGrid(10);
+            var generator = new WordSearchGenerator(grid);
+
+            generator.AddWord("HELLO", EDirection.Vertical);
+
+            var word = grid.IncludedWords[0];
+            Assert.Equal(EDirection.Vertical, word.Direction);
+            Assert.Equal('H', grid.Grid[word.StartPosition.Row, word.StartPosition.Col]);
+            Assert.Equal('O', grid.Grid[word.StartPosition.Row + 4, word.StartPosition.Col]);
+        }
     }
 }

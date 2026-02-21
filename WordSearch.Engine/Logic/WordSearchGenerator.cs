@@ -16,6 +16,11 @@ namespace WordSearch.Engine.Logic
 
         public AddWordResult AddWord(string word)
         {
+            return AddWord(word, null);
+        }
+
+        public AddWordResult AddWord(string word, EDirection? direction)
+        {
             if (string.IsNullOrWhiteSpace(word))
                 return AddWordResult.Failed("Word cannot be empty");
 
@@ -32,7 +37,7 @@ namespace WordSearch.Engine.Logic
             if (Grid.IncludedWords.Contains(typedWord))
                 return AddWordResult.Failed("Word has already been added");
 
-            if (!TryPlaceWord(typedWord))
+            if (!TryPlaceWord(typedWord, direction))
             {
                 return AddWordResult.Failed("Could not fit word in grid");
             }
@@ -52,9 +57,11 @@ namespace WordSearch.Engine.Logic
             
         }
 
-        private bool TryPlaceWord(IncludedWord word)
+        private bool TryPlaceWord(IncludedWord word, EDirection? forcedDirection)
         {
-            EDirection[] directions = GetShuffledDirections();
+            EDirection[] directions = forcedDirection.HasValue
+                ? new[] { forcedDirection.Value }
+                : GetShuffledDirections();
 
             foreach (var direction in directions)
             {
