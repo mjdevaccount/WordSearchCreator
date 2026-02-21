@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using WordSearch.Engine.Models;
 
 namespace WordSearch.Engine.Interface
 {
     public interface IWordSearchGenerator
     {
-        void AddWord(string word);
+        AddWordResult AddWord(string word);
 
         void FillEmptySpaces();
 

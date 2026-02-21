@@ -17,9 +17,14 @@ namespace WordSearch.Engine.Logic
             Grid = grid;
         }
 
-        public void AddWord(string word)
+        public AddWordResult AddWord(string word)
         {
-            
+            if (word.Length > Grid.Size)
+                return AddWordResult.Failed("Word is too long for the grid");
+
+            // placement logic...
+
+            return AddWordResult.Ok();
         }
 
         public void FillEmptySpaces()
