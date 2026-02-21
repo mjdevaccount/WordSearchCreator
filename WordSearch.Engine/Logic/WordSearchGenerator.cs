@@ -19,7 +19,7 @@ namespace WordSearch.Engine.Logic
             return AddWord(word, null);
         }
 
-        public AddWordResult AddWord(string word, EDirection? direction)
+        public AddWordResult AddWord(string word, EDirection? forcedDirection)
         {
             if (string.IsNullOrWhiteSpace(word))
                 return AddWordResult.Failed("Word cannot be empty");
@@ -37,7 +37,7 @@ namespace WordSearch.Engine.Logic
             if (Grid.IncludedWords.Contains(typedWord))
                 return AddWordResult.Failed("Word has already been added");
 
-            if (!TryPlaceWord(typedWord, direction))
+            if (!TryPlaceWord(typedWord, forcedDirection))
             {
                 return AddWordResult.Failed("Could not fit word in grid");
             }
