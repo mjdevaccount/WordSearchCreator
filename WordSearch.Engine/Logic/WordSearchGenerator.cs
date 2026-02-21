@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using WordSearch.Engine.Interface;
 using WordSearch.Engine.Models;
@@ -7,6 +8,7 @@ namespace WordSearch.Engine.Logic
 {
     public class WordSearchGenerator : IWordSearchGenerator
     {
+        private readonly Random _random = new Random();
         public WordSearchGrid Grid { get; }
 
         public WordSearchGenerator(WordSearchGrid grid)
@@ -59,19 +61,18 @@ namespace WordSearch.Engine.Logic
 
         private bool TryPlaceWord(IncludedWord word, EDirection? forcedDirection)
         {
-            EDirection[] directions = forcedDirection.HasValue
-                ? new[] { forcedDirection.Value }
+            List<EDirection> directions = forcedDirection.HasValue
+                ? new List<EDirection> { forcedDirection.Value }
                 : GetShuffledDirections();
 
-            foreach (var direction in directions)
+            foreach (EDirection direction in directions)
             {
-                var validStarts = GetValidStartingPositions(word.Word, direction);
-
-                foreach (var start in validStarts)
+                List<(int Row, int Col)> validStarts = GetValidStartingPositions(word.Word, direction);
+                Shuffle(validStarts);
+                
+                foreach ((int Row, int Col) start in validStarts
+                             .Where(start => CanPlace(word.Word, start, direction)))
                 {
-                    if (!CanPlace(word.Word, start, direction)) 
-                        continue;
-                    
                     Place(word.Word, start, direction);
                     word.StartPosition = start;
                     word.Direction = direction;
@@ -100,14 +101,17 @@ namespace WordSearch.Engine.Logic
             return true;
         }
 
-
-        private EDirection[] GetShuffledDirections()
+        private List<EDirection> GetShuffledDirections()
         {
-            return new[]
+            var baseList = new List<EDirection>
             {
                 EDirection.Horizonal,
                 EDirection.Vertical
             };
+            
+            Shuffle(baseList);
+
+            return baseList;
         }
 
         private (int RowShift, int ColShift) GetShifts(EDirection direction)
@@ -154,6 +158,17 @@ namespace WordSearch.Engine.Logic
             }
 
             return positions;
+        }
+
+        private void Shuffle<T>(List<T> list)
+        {
+            for (int i = list.Count - 1; i > 0; i--)
+            {
+                int j = _random.Next(i + 1);
+                T temp = list[i];
+                list[i] = list[j];
+                list[j] = temp;
+            }
         }
     }
 }
