@@ -26,9 +26,13 @@ namespace WordSearch.Engine.Logic
             if (word.Length > Grid.Size)
                 return AddWordResult.Failed("Word is too long for the grid");
 
-            
-            
-            
+            IncludedWord typedWord = new IncludedWord(word);
+
+            if (Grid.IncludedWords.Contains(typedWord))
+                return AddWordResult.Failed("Word has already been added");
+
+            Grid.IncludedWords.Add(typedWord);
+
             return AddWordResult.Ok();
         }
 

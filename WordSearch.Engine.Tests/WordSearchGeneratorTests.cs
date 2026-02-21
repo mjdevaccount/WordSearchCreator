@@ -71,5 +71,41 @@ namespace WordSearch.Engine.Tests
 
             Assert.False(result.Success);
         }
+
+        [Fact]
+        public void AddWord_DuplicateWord_ReturnsFailure()
+        {
+            var grid = new WordSearchGrid(10);
+            var generator = new WordSearchGenerator(grid);
+
+            generator.AddWord("hello");
+            var result = generator.AddWord("hello");
+
+            Assert.False(result.Success);
+        }
+
+        [Fact]
+        public void AddWord_DuplicateWordDifferentCase_ReturnsFailure()
+        {
+            var grid = new WordSearchGrid(10);
+            var generator = new WordSearchGenerator(grid);
+
+            generator.AddWord("Hello");
+            var result = generator.AddWord("HELLO");
+
+            Assert.False(result.Success);
+        }
+
+        [Fact]
+        public void AddWord_ValidWord_AddsToIncludedWords()
+        {
+            var grid = new WordSearchGrid(10);
+            var generator = new WordSearchGenerator(grid);
+
+            generator.AddWord("hello");
+
+            Assert.Single(grid.IncludedWords);
+            Assert.Equal("HELLO", grid.IncludedWords[0].Word);
+        }
     }
 }
