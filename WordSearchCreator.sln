@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.37012.4 d17.14
+VisualStudioVersion = 17.14.37012.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordSearch.Engine", "WordSearch.Engine\WordSearch.Engine.csproj", "{18B26EAB-85E2-4821-AE42-B132A9A6A5E3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordSearch.Engine.Tests", "WordSearch.Engine.Tests\WordSearch.Engine.Tests.csproj", "{4902DB43-A9F2-4C55-A2C6-38BF6DB16396}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WordSearch.Web", "WordSearch.Web\WordSearch.Web.csproj", "{2D66D183-0A0D-49AD-9DAF-656B7F61E7C9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{4902DB43-A9F2-4C55-A2C6-38BF6DB16396}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4902DB43-A9F2-4C55-A2C6-38BF6DB16396}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4902DB43-A9F2-4C55-A2C6-38BF6DB16396}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D66D183-0A0D-49AD-9DAF-656B7F61E7C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D66D183-0A0D-49AD-9DAF-656B7F61E7C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D66D183-0A0D-49AD-9DAF-656B7F61E7C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D66D183-0A0D-49AD-9DAF-656B7F61E7C9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
