@@ -6,6 +6,11 @@ namespace WordSearch.Engine.Models
     {
         public string Word { get; }
 
+        public (int Row, int Col) StartPosition { get; set; }
+        public EDirection Direction { get; set; }
+        public bool IsAdded { get; set; }
+
+
         public IncludedWord(string word)
         {
             Word = word.ToUpper();

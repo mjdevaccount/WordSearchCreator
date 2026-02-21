@@ -107,5 +107,26 @@ namespace WordSearch.Engine.Tests
             Assert.Single(grid.IncludedWords);
             Assert.Equal("HELLO", grid.IncludedWords[0].Word);
         }
+
+        [Fact]
+        public void AddWord_ValidWord_GridContainsLetters()
+        {
+            var grid = new WordSearchGrid(10);
+            var generator = new WordSearchGenerator(grid);
+
+            generator.AddWord("HELLO");
+
+            int filledCells = 0;
+            for (int row = 0; row < grid.Size; row++)
+            {
+                for (int col = 0; col < grid.Size; col++)
+                {
+                    if (grid.Grid[row, col] != WordSearchGrid.Empty)
+                        filledCells++;
+                }
+            }
+
+            Assert.Equal(5, filledCells);
+        }
     }
 }
