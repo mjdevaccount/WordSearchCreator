@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using WordSearch.Engine.Interface;
 using WordSearch.Engine.Models;
 
@@ -19,11 +15,20 @@ namespace WordSearch.Engine.Logic
 
         public AddWordResult AddWord(string word)
         {
+            if (string.IsNullOrWhiteSpace(word))
+                return AddWordResult.Failed("Word cannot be empty");
+
+            word = word.ToUpper();
+
+            if (!word.All(char.IsLetter))
+                return AddWordResult.Failed("Word must contain only letters");
+
             if (word.Length > Grid.Size)
                 return AddWordResult.Failed("Word is too long for the grid");
 
-            // placement logic...
-
+            
+            
+            
             return AddWordResult.Ok();
         }
 

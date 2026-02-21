@@ -38,5 +38,38 @@ namespace WordSearch.Engine.Tests
             Assert.False(result.Success);
             Assert.NotNull(result.ErrorMessage);
         }
+
+        [Fact]
+        public void AddWord_EmptyString_ReturnsFailure()
+        {
+            var grid = new WordSearchGrid(10);
+            var generator = new WordSearchGenerator(grid);
+
+            var result = generator.AddWord("");
+
+            Assert.False(result.Success);
+        }
+
+        [Fact]
+        public void AddWord_ContainsNumbers_ReturnsFailure()
+        {
+            var grid = new WordSearchGrid(10);
+            var generator = new WordSearchGenerator(grid);
+
+            var result = generator.AddWord("hello123");
+
+            Assert.False(result.Success);
+        }
+
+        [Fact]
+        public void AddWord_ContainsSpaces_ReturnsFailure()
+        {
+            var grid = new WordSearchGrid(10);
+            var generator = new WordSearchGenerator(grid);
+
+            var result = generator.AddWord("hello world");
+
+            Assert.False(result.Success);
+        }
     }
 }
