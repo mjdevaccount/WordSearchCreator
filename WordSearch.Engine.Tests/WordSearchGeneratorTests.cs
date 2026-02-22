@@ -172,7 +172,31 @@ namespace WordSearch.Engine.Tests
             Assert.Equal((4, 2), word.StartPosition);
             Assert.Equal(EDirection.Vertical, word.Direction);
         }
-        
-        
+
+        [Fact]
+        public void AddWord_Horizontal_WordFitsExactlyAtEndOfRow()
+        {
+            var grid = new WordSearchGrid(5);
+            var generator = new WordSearchGenerator(grid);
+
+            var result = generator.AddWord("HELLO", EDirection.Horizonal);
+
+            Assert.True(result.Success);
+            var word = grid.IncludedWords[0];
+            Assert.Equal(0, word.StartPosition.Col);
+        }
+
+        [Fact]
+        public void AddWord_Vertical_WordFitsExactlyAtEndOfColumn()
+        {
+            var grid = new WordSearchGrid(5);
+            var generator = new WordSearchGenerator(grid);
+
+            var result = generator.AddWord("HELLO", EDirection.Vertical);
+
+            Assert.True(result.Success);
+            var word = grid.IncludedWords[0];
+            Assert.Equal(0, word.StartPosition.Row);
+        }
     }
 }
