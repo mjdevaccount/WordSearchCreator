@@ -321,5 +321,17 @@ namespace WordSearch.Engine.Tests
             Assert.Equal('A', grid.Grid[startPos.Row, startPos.Col + 1]);
             Assert.Equal('T', grid.Grid[startPos.Row, startPos.Col + 2]);
         }
+
+        [Fact]
+        public void Rebuild_WithExistingWords_ReplacesWordsInNewPositions()
+        {
+            var grid = new WordSearchGrid(10);
+            var generator = new WordSearchGenerator(grid, new Random(12345));
+            generator.AddWord("CAT");
+            generator.AddWord("DOG");
+            bool result = generator.Rebuild();
+            Assert.True(result);
+            Assert.Equal(2, grid.IncludedWords.Count);
+        }
     }
 }
