@@ -58,7 +58,16 @@ namespace WordSearch.Engine.Logic
 
         public void FillEmptySpaces()
         {
-            
+            for (int row = 0; row < Grid.Size; row++)
+            {
+                for (int col = 0; col < Grid.Size; col++)
+                {
+                    if (Grid.Grid[row, col] == WordSearchGrid.Empty)
+                    {
+                        Grid.Grid[row, col] = WordSearchGrid.Letters[_random.Next(WordSearchGrid.Letters.Length)];
+                    }
+                }
+            }
         }
 
         public void Rebuild()

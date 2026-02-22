@@ -5,8 +5,8 @@ namespace WordSearch.Engine.Models
     public class WordSearchGrid
     {
         public const char Empty = '\0';
-       
-        
+        public const string Letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
         public int Size { get; }
         public char[,] Grid { get; set; }
         public List<IncludedWord> IncludedWords { get; set; }
