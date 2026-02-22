@@ -8,6 +8,6 @@ namespace WordSearch.Engine.Interface
 
         void FillEmptySpaces();
 
-        void Rebuild();
+        bool Rebuild();
     }
 }

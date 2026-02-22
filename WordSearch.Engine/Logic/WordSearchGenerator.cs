@@ -70,9 +70,31 @@ namespace WordSearch.Engine.Logic
             }
         }
 
-        public void Rebuild()
+        public bool Rebuild()
         {
-            
+            List<string> words = Grid.IncludedWords.Select(w => w.Word).ToList();
+            Grid.IncludedWords.Clear();
+            ClearGrid();
+
+            bool allPlaced = words.All(word => AddWord(word).Success);
+
+            if (allPlaced)
+            {
+                FillEmptySpaces();
+            }
+
+            return allPlaced;
+        }
+
+        private void ClearGrid()
+        {
+            for (int row = 0; row < Grid.Size; row++)
+            {
+                for (int col = 0; col < Grid.Size; col++)
+                {
+                    Grid.Grid[row, col] = WordSearchGrid.Empty;
+                }
+            }
         }
 
         private bool TryPlaceWord(IncludedWord word, EDirection? forcedDirection)
