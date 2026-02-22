@@ -46,5 +46,15 @@ namespace WordSearch.Web.Controllers
             generator.Rebuild();
             return PartialView("_Grid", generator.Grid);
         }
+
+        public ActionResult Solve()
+        {
+            var generator = Session[SessionKey] as WordSearchGenerator;
+            if (generator == null)
+                return RedirectToAction("Index");
+
+            generator.FillEmptySpaces();
+            return View(generator.Grid);
+        }
     }
 }
