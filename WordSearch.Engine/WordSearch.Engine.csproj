@@ -41,13 +41,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Interface\IWordSearchGenerator.cs" />
+    <Compile Include="Logic\WordSearchGenerator.cs" />
+    <Compile Include="Models\AddWordResult.cs" />
+    <Compile Include="Models\EDirection.cs" />
     <Compile Include="Models\IncludedWord.cs" />
     <Compile Include="Models\WordSearchGrid.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Interface\" />
-    <Folder Include="Logic\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
