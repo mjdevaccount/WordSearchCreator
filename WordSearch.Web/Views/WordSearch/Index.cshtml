@@ -1,0 +1,82 @@
+﻿@{
+    ViewBag.Title = "Word Search Creator";
+}
+
+<div class="container">
+    <h1>Word Search Creator</h1>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Setup</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label for="gridSize">Grid Size</label>
+                        <input type="number" id="gridSize" class="form-control" min="5" max="20" value="10" />
+                    </div>
+                    <button id="btnCreateGrid" class="btn btn-primary">Create Grid</button>
+                </div>
+            </div>
+
+            <div id="wordPanel" class="panel panel-default" style="display:none;">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Add Words</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <label for="wordInput">Word</label>
+                        <input type="text" id="wordInput" class="form-control" />
+                    </div>
+                    <button id="btnAddWord" class="btn btn-success">Add Word</button>
+                    <button id="btnRebuild" class="btn btn-warning">Rebuild</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div id="gridContainer"></div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            $('#btnCreateGrid').click(function () {
+                var size = $('#gridSize').val();
+                $.post('@Url.Action("CreateGrid", "WordSearch")', { size: size }, function (response) {
+                    $('#gridContainer').html(response);
+                    $('#wordPanel').show();
+                    $('#errorMessage').hide();
+                });
+            });
+        });
+
+        $('#btnAddWord').click(function () {
+            var word = $('#wordInput').val();
+            $.post('@Url.Action("AddWord", "WordSearch")', { word: word }, function (response) {
+                if (response.success === false) {
+                    $('#errorMessage').text(response.message).show();
+                } else {
+                    $('#gridContainer').html(response);
+                    $('#wordInput').val('');
+                    $('#errorMessage').hide();
+                }
+            });
+        });
+
+        $('#btnRebuild').click(function () {
+            $.post('@Url.Action("Rebuild", "WordSearch")', function (response) {
+                if (response.success === false) {
+                    $('#errorMessage').text(response.message).show();
+                } else {
+                    $('#gridContainer').html(response);
+                    $('#errorMessage').hide();
+                }
+            });
+        });
+
+    </script>
+}
