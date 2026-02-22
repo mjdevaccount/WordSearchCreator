@@ -287,5 +287,39 @@ namespace WordSearch.Engine.Tests
             Assert.True(dogResult.Success);
             Assert.False(bagResult.Success);
         }
+
+        [Fact]
+        public void FillEmptySpaces_FillsAllEmptyCells()
+        {
+            var grid = new WordSearchGrid(5);
+            var generator = new WordSearchGenerator(grid);
+            generator.AddWord("CAT");
+
+            generator.FillEmptySpaces();
+
+            for (int row = 0; row < grid.Size; row++)
+            {
+                for (int col = 0; col < grid.Size; col++)
+                {
+                    Assert.NotEqual(WordSearchGrid.Empty, grid.Grid[row, col]);
+                }
+            }
+        }
+
+        [Fact]
+        public void FillEmptySpaces_OnlyFillsEmptyCells_DoesNotOverwriteWords()
+        {
+            var grid = new WordSearchGrid(5);
+            var generator = new WordSearchGenerator(grid);
+            generator.AddWord("CAT", EDirection.Horizonal);
+            var word = grid.IncludedWords[0];
+            var startPos = word.StartPosition;
+
+            generator.FillEmptySpaces();
+
+            Assert.Equal('C', grid.Grid[startPos.Row, startPos.Col]);
+            Assert.Equal('A', grid.Grid[startPos.Row, startPos.Col + 1]);
+            Assert.Equal('T', grid.Grid[startPos.Row, startPos.Col + 2]);
+        }
     }
 }
