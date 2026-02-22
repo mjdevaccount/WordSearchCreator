@@ -1,0 +1,70 @@
+﻿@model WordSearch.Engine.Models.WordSearchGrid
+
+@{
+    ViewBag.Title = "Solve Word Search";
+}
+
+<div class="container">
+    <h1>Solve Word Search</h1>
+
+    <div class="row" style="margin-bottom: 15px;">
+        <div class="col-md-12">
+            <a href="@Url.Action("Index", "WordSearch")" class="btn btn-default">← Back to Builder</a>
+        </div>
+    </div>
+
+    <div id="solveGridContainer">
+        @Html.Partial("_SolveGrid", Model)
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+
+            function getShifts(direction) {
+                switch (direction) {
+                    case 'Horizonal': return { row: 0, col: 1 };
+                    case 'Vertical': return { row: 1, col: 0 };
+                    default: return { row: 0, col: 1 };
+                }
+            }
+
+            function highlightWord($wordItem) {
+                var startRow = parseInt($wordItem.data('start-row'));
+                var startCol = parseInt($wordItem.data('start-col'));
+                var direction = $wordItem.data('direction');
+                var length = parseInt($wordItem.data('length'));
+                var shifts = getShifts(direction);
+
+                for (var i = 0; i < length; i++) {
+                    var row = startRow + (i * shifts.row);
+                    var col = startCol + (i * shifts.col);
+                    $('td[data-row="' + row + '"][data-col="' + col + '"]').addClass('highlighted');
+                }
+
+                $wordItem.addClass('found');
+            }
+
+            function clearHighlights() {
+                $('.word-search-grid td').removeClass('highlighted');
+                $('.word-item').removeClass('found');
+            }
+
+            $('.word-item').click(function () {
+                highlightWord($(this));
+            });
+
+            $('#btnShowAll').click(function () {
+                clearHighlights();
+                $('.word-item').each(function () {
+                    highlightWord($(this));
+                });
+            });
+
+            $('#btnClearHighlights').click(function () {
+                clearHighlights();
+            });
+        });
+    </script>
+}
