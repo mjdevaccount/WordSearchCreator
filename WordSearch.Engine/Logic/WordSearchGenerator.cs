@@ -153,12 +153,17 @@ namespace WordSearch.Engine.Logic
             var (rowShift, colShift) = GetShifts(direction);
 
             int minRow = 0;
-            int maxRow = Grid.Size - word.Length * rowShift;
-            int maxCol = Grid.Size - word.Length * colShift;
+            int maxRow = rowShift == 0
+                ? Grid.Size
+                : Grid.Size - word.Length + 1;
 
-            for (int row = minRow; row <= maxRow; row++)
+            int maxCol = colShift == 0
+                ? Grid.Size
+                : Grid.Size - word.Length + 1;
+
+            for (int row = minRow; row < maxRow; row++)
             {
-                for (int col = 0; col <= maxCol; col++)
+                for (int col = 0; col < maxCol; col++)
                 {
                     positions.Add((row, col));
                 }

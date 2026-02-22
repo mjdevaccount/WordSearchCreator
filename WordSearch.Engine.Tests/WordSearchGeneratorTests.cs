@@ -169,7 +169,7 @@ namespace WordSearch.Engine.Tests
 
             var word = grid.IncludedWords[0];
 
-            Assert.Equal((4, 2), word.StartPosition);
+            Assert.Equal((0, 1), word.StartPosition);
             Assert.Equal(EDirection.Vertical, word.Direction);
         }
 
@@ -197,6 +197,30 @@ namespace WordSearch.Engine.Tests
             Assert.True(result.Success);
             var word = grid.IncludedWords[0];
             Assert.Equal(0, word.StartPosition.Row);
+        }
+
+        [Fact]
+        public void AddWord_Horizontal_MaxLengthWord()
+        {
+            var grid = new WordSearchGrid(10);
+            var generator = new WordSearchGenerator(grid);
+
+            var result = generator.AddWord("ABCDEFGHIJ", EDirection.Horizonal);
+
+            Assert.True(result.Success);
+            Assert.Equal(0, grid.IncludedWords[0].StartPosition.Col);
+        }
+
+        [Fact]
+        public void AddWord_Vertical_MaxLengthWord()
+        {
+            var grid = new WordSearchGrid(10);
+            var generator = new WordSearchGenerator(grid);
+
+            var result = generator.AddWord("ABCDEFGHIJ", EDirection.Vertical);
+
+            Assert.True(result.Success);
+            Assert.Equal(0, grid.IncludedWords[0].StartPosition.Row);
         }
     }
 }
