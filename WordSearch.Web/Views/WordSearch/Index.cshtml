@@ -40,3 +40,18 @@
         </div>
     </div>
 </div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            $('#btnCreateGrid').click(function () {
+                var size = $('#gridSize').val();
+                $.post('@Url.Action("CreateGrid", "WordSearch")', { size: size }, function (response) {
+                    $('#gridContainer').html(response);
+                    $('#wordPanel').show();
+                    $('#errorMessage').hide();
+                });
+            });
+        });
+    </script>
+}
