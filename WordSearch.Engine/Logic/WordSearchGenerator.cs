@@ -8,12 +8,19 @@ namespace WordSearch.Engine.Logic
 {
     public class WordSearchGenerator : IWordSearchGenerator
     {
-        private readonly Random _random = new Random();
+        private readonly Random _random;
         public WordSearchGrid Grid { get; }
 
-        public WordSearchGenerator(WordSearchGrid grid)
+        public WordSearchGenerator(WordSearchGrid grid) 
+            : this(grid, new Random())
+        {
+            
+        }
+
+        public WordSearchGenerator(WordSearchGrid grid, Random random)
         {
             Grid = grid;
+            _random = random;
         }
 
         public AddWordResult AddWord(string word)

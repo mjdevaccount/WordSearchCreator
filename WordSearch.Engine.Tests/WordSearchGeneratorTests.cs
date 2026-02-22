@@ -1,4 +1,5 @@
-﻿using WordSearch.Engine.Logic;
+﻿using System;
+using WordSearch.Engine.Logic;
 using WordSearch.Engine.Models;
 using Xunit;
 
@@ -156,5 +157,22 @@ namespace WordSearch.Engine.Tests
             Assert.Equal('H', grid.Grid[word.StartPosition.Row, word.StartPosition.Col]);
             Assert.Equal('O', grid.Grid[word.StartPosition.Row + 4, word.StartPosition.Col]);
         }
+
+        [Fact]
+        public void AddWord_WithSeededRandom_DiscoverValues()
+        {
+            var grid = new WordSearchGrid(10);
+            var random = new Random(12345);
+            var generator = new WordSearchGenerator(grid, random);
+
+            generator.AddWord("HELLO");
+
+            var word = grid.IncludedWords[0];
+
+            Assert.Equal((4, 2), word.StartPosition);
+            Assert.Equal(EDirection.Vertical, word.Direction);
+        }
+        
+        
     }
 }
