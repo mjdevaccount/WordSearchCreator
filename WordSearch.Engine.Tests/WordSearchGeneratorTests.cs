@@ -222,5 +222,70 @@ namespace WordSearch.Engine.Tests
             Assert.True(result.Success);
             Assert.Equal(0, grid.IncludedWords[0].StartPosition.Row);
         }
+
+        [Fact]
+        public void AddWord_GridSize1_SingleLetterWord_Succeeds()
+        {
+            var grid = new WordSearchGrid(1);
+            var generator = new WordSearchGenerator(grid);
+
+            var result = generator.AddWord("A");
+
+            Assert.True(result.Success);
+            Assert.Equal('A', grid.Grid[0, 0]);
+        }
+
+        [Fact]
+        public void AddWord_WordsCanOverlapWithMatchingLetters()
+        {
+            var grid = new WordSearchGrid(10);
+            var generator = new WordSearchGenerator(grid);
+
+            var helloSuccess = generator.AddWord("HELLO", EDirection.Horizonal);
+            var llamaSuccess = generator.AddWord("LLAMA", EDirection.Vertical);
+
+            Assert.True(helloSuccess.Success && llamaSuccess.Success);
+        }
+
+        [Fact]
+        public void AddWord_WordsCannotOverlapWithConflictingLetters()
+        {
+            var grid = new WordSearchGrid(5);
+            var generator = new WordSearchGenerator(grid);
+
+            var firstWordSuccess = generator.AddWord("AAAAA", EDirection.Horizonal);
+            Assert.True(firstWordSuccess.Success);
+            
+            var secondWordFail = generator.AddWord("BBBBB", EDirection.Vertical);
+            Assert.False(secondWordFail.Success);
+        }
+
+        [Fact]
+        public void AddWord_3x3Grid_DOGandGIL_ShareG_Succeeds()
+        {
+            var grid = new WordSearchGrid(3);
+            var seededRandom = new Random(0);
+            var generator = new WordSearchGenerator(grid, seededRandom);
+
+            var dogResult = generator.AddWord("DOG", EDirection.Horizonal);
+            var gilResult = generator.AddWord("GIL", EDirection.Vertical);
+
+            Assert.True(dogResult.Success);
+            Assert.True(gilResult.Success);
+        }
+
+        [Fact]
+        public void AddWord_3x3Grid_DOGandBAG_Conflict_Fails()
+        {
+            var grid = new WordSearchGrid(3);
+            var seededRandom = new Random(0);
+            var generator = new WordSearchGenerator(grid, seededRandom);
+
+            var dogResult = generator.AddWord("DOG", EDirection.Horizonal);
+            var bagResult = generator.AddWord("BAG", EDirection.Vertical);
+
+            Assert.True(dogResult.Success);
+            Assert.False(bagResult.Success);
+        }
     }
 }
