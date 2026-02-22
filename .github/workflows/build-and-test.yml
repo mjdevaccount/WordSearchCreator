@@ -1,0 +1,32 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v2
+
+    - name: Setup VSTest
+      uses: darenm/Setup-VSTest@v1.2
+
+    - name: Restore NuGet packages
+      run: nuget restore WordSearchCreator.sln
+
+    - name: Build
+      run: msbuild /p:Configuration=Release
+
+    - name: Test
+      run: vstest.console.exe .\WordSearch.Engine.Tests\bin\Release\WordSearch.Engine.Tests.dll
