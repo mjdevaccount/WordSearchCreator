@@ -53,5 +53,30 @@
                 });
             });
         });
+
+        $('#btnAddWord').click(function () {
+            var word = $('#wordInput').val();
+            $.post('@Url.Action("AddWord", "WordSearch")', { word: word }, function (response) {
+                if (response.success === false) {
+                    $('#errorMessage').text(response.message).show();
+                } else {
+                    $('#gridContainer').html(response);
+                    $('#wordInput').val('');
+                    $('#errorMessage').hide();
+                }
+            });
+        });
+
+        $('#btnRebuild').click(function () {
+            $.post('@Url.Action("Rebuild", "WordSearch")', function (response) {
+                if (response.success === false) {
+                    $('#errorMessage').text(response.message).show();
+                } else {
+                    $('#gridContainer').html(response);
+                    $('#errorMessage').hide();
+                }
+            });
+        });
+
     </script>
 }
