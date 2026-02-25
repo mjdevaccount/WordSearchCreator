@@ -1,65 +1,14 @@
-﻿@model WordSearch.Engine.Models.WordSearchGrid
+@model WordSearch.Engine.Models.WordSearchGrid
 
-<div class="row">
-    <div class="col-md-8">
-        <table class="word-search-grid">
-            @for (int row = 0; row < Model.Size; row++)
+<table class="ws-puzzle-grid" id="solveTable">
+    @for (int row = 0; row < Model.Size; row++)
+    {
+        <tr>
+            @for (int col = 0; col < Model.Size; col++)
             {
-                <tr>
-                    @for (int col = 0; col < Model.Size; col++)
-                    {
-                        var cell = Model.Grid[row, col];
-                        <td data-row="@row" data-col="@col">@cell</td>
-                    }
-                </tr>
+                var cell = Model.Grid[row, col];
+                <td class="ws-grid-cell" data-row="@row" data-col="@col">@cell</td>
             }
-        </table>
-    </div>
-    <div class="col-md-4">
-        <h4>Words</h4>
-        <button id="btnShowAll" class="btn btn-info btn-sm" style="margin-bottom: 10px;">Show All</button>
-        <button id="btnClearHighlights" class="btn btn-secondary btn-sm" style="margin-bottom: 10px;">Clear</button>
-        <ul class="list-group">
-            @foreach (var word in Model.IncludedWords)
-            {
-                <li class="list-group-item word-item"
-                    data-word="@word.Word"
-                    data-start-row="@word.StartPosition.Row"
-                    data-start-col="@word.StartPosition.Col"
-                    data-direction="@word.Direction"
-                    data-length="@word.Word.Length"
-                    style="cursor: pointer;">
-                    @word.Word
-                </li>
-            }
-        </ul>
-    </div>
-</div>
-
-<style>
-    .word-search-grid {
-        border-collapse: collapse;
-        font-family: monospace;
-        font-size: 18px;
+        </tr>
     }
-
-        .word-search-grid td {
-            width: 30px;
-            height: 30px;
-            text-align: center;
-            border: 1px solid #ccc;
-        }
-
-            .word-search-grid td.highlighted {
-                background-color: #ffeb3b;
-            }
-
-    .word-item:hover {
-        background-color: #f0f0f0;
-    }
-
-    .word-item.found {
-        background-color: #c8e6c9;
-        text-decoration: line-through;
-    }
-</style>
+</table>

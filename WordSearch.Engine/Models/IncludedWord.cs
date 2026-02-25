@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace WordSearch.Engine.Models
 {
@@ -7,9 +7,9 @@ namespace WordSearch.Engine.Models
         public string Word { get; }
 
         public (int Row, int Col) StartPosition { get; set; }
+        public (int Row, int Col) EndPosition { get; set; }
         public EDirection Direction { get; set; }
         public bool IsAdded { get; set; }
-
 
         public IncludedWord(string word)
         {

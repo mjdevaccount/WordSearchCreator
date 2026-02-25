@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "WordSearch.Web (IIS Express HTTP)",
+      "runtimeExecutable": "C:/Program Files (x86)/IIS Express/iisexpress.exe",
+      "runtimeArgs": [
+        "/site:WordSearch.Web",
+        "/config:C:/Users/mattj/source/repos/WordSearchCreator/.vs/WordSearchCreator/config/applicationhost.config"
+      ],
+      "port": 65469
+    },
+    {
+      "name": "WordSearch.Web (IIS Express HTTPS)",
+      "runtimeExecutable": "C:/Program Files (x86)/IIS Express/iisexpress.exe",
+      "runtimeArgs": [
+        "/site:WordSearch.Web",
+        "/config:C:/Users/mattj/source/repos/WordSearchCreator/.vs/WordSearchCreator/config/applicationhost.config"
+      ],
+      "port": 44384
+    }
+  ]
+}
