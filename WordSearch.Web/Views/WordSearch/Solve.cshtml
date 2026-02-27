@@ -1,70 +1,234 @@
-﻿@model WordSearch.Engine.Models.WordSearchGrid
+@using Newtonsoft.Json
+@model WordSearch.Engine.Models.WordSearchGrid
 
 @{
-    ViewBag.Title = "Solve Word Search";
+    ViewBag.Title = "Solve – Word Search";
+
+    var wordDataJson = JsonConvert.SerializeObject(
+        Model.IncludedWords.Select(w => new {
+            word      = w.Word,
+            startRow  = w.StartPosition.Row,
+            startCol  = w.StartPosition.Col,
+            direction = w.Direction.ToString(),
+            length    = w.Word.Length
+        })
+    );
 }
 
-<div class="container">
-    <h1>Solve Word Search</h1>
+<div class="ws-solve-page">
 
-    <div class="row" style="margin-bottom: 15px;">
-        <div class="col-md-12">
-            <a href="@Url.Action("Index", "WordSearch")" class="btn btn-default">← Back to Builder</a>
+    <!-- ══════════ GRID AREA ══════════ -->
+    <div class="ws-solve-grid-area">
+        <div class="ws-solve-header">
+            <a href="@Url.Action("Index", "WordSearch")" class="ws-btn ws-btn-outline">← Builder</a>
+            <span class="ws-progress-text">
+                Found <span class="ws-progress-count" id="foundCount">0</span> / @Model.IncludedWords.Count
+            </span>
         </div>
+
+        <div id="celebrationBanner" class="ws-celebration">
+            🎉 Amazing! You found all @Model.IncludedWords.Count words! 🎉
+        </div>
+
+        @Html.Partial("_SolveGrid", Model)
     </div>
 
-    <div id="solveGridContainer">
-        @Html.Partial("_SolveGrid", Model)
+    <!-- ══════════ WORD LIST SIDEBAR ══════════ -->
+    <div class="ws-solve-sidebar">
+        <div class="ws-solve-sidebar-title">Find these words</div>
+        <div class="ws-solve-word-list" id="wordList">
+            @foreach (var word in Model.IncludedWords)
+            {
+                <div class="ws-solve-word-item" data-word-key="@word.Word">
+                    <span class="ws-solve-word-text">@word.Word</span>
+                    <button class="ws-hint-btn" title="Show a hint" data-word-key="@word.Word">?</button>
+                </div>
+            }
+        </div>
     </div>
 </div>
 
 @section scripts {
-    <script>
-        $(document).ready(function () {
+<script>
+$(function () {
 
-            function getShifts(direction) {
-                switch (direction) {
-                    case 'Horizonal': return { row: 0, col: 1 };
-                    case 'Vertical': return { row: 1, col: 0 };
-                    default: return { row: 0, col: 1 };
-                }
+    /* ── Word data embedded from server ── */
+    var wordData = @Html.Raw(wordDataJson);
+    wordData.forEach(function (w) { w.found = false; });
+
+    /* ── Direction shift map ── */
+    var dirShifts = {
+        'Horizontal':        { dr:  0, dc:  1 },
+        'HorizontalReverse': { dr:  0, dc: -1 },
+        'Vertical':          { dr:  1, dc:  0 },
+        'VerticalUp':        { dr: -1, dc:  0 },
+        'DiagonalDownRight': { dr:  1, dc:  1 },
+        'DiagonalDownLeft':  { dr:  1, dc: -1 },
+        'DiagonalUpRight':   { dr: -1, dc:  1 },
+        'DiagonalUpLeft':    { dr: -1, dc: -1 }
+    };
+
+    /* ── State ── */
+    var isDragging   = false;
+    var startCell    = null;
+    var currentSel   = [];
+
+    /* ── Helpers ── */
+    function getCell(r, c) {
+        return $('td.ws-grid-cell[data-row="' + r + '"][data-col="' + c + '"]');
+    }
+
+    function getDirection(r1, c1, r2, c2) {
+        var dr = r2 - r1, dc = c2 - c1;
+        if (dr === 0 && dc === 0) return null;
+        // Valid: horizontal, vertical, or diagonal (|dr| == |dc|)
+        if (dr !== 0 && dc !== 0 && Math.abs(dr) !== Math.abs(dc)) return null;
+        return {
+            dr:    dr === 0 ? 0 : (dr > 0 ? 1 : -1),
+            dc:    dc === 0 ? 0 : (dc > 0 ? 1 : -1),
+            steps: Math.max(Math.abs(dr), Math.abs(dc))
+        };
+    }
+
+    function buildSelection(r1, c1, dir) {
+        var cells = [];
+        for (var i = 0; i <= dir.steps; i++) {
+            var r = r1 + i * dir.dr, c = c1 + i * dir.dc;
+            var $td = getCell(r, c);
+            if ($td.length) cells.push({ row: r, col: c, el: $td });
+        }
+        return cells;
+    }
+
+    function applySelecting(cells) {
+        $('.ws-grid-cell:not(.found-cell)').removeClass('selecting');
+        cells.forEach(function (c) { if (!c.el.hasClass('found-cell')) c.el.addClass('selecting'); });
+        currentSel = cells;
+    }
+
+    function clearSelecting() {
+        $('.ws-grid-cell').removeClass('selecting');
+        currentSel = [];
+    }
+
+    /* ── Mouse drag ── */
+    var $table = $('#solveTable');
+
+    $table.on('mousedown', 'td.ws-grid-cell', function (e) {
+        e.preventDefault();
+        isDragging = true;
+        var r = parseInt($(this).data('row')), c = parseInt($(this).data('col'));
+        startCell = { row: r, col: c };
+        applySelecting([{ row: r, col: c, el: $(this) }]);
+    });
+
+    $table.on('mousemove', 'td.ws-grid-cell', function () {
+        if (!isDragging || !startCell) return;
+        var r = parseInt($(this).data('row')), c = parseInt($(this).data('col'));
+        var dir = getDirection(startCell.row, startCell.col, r, c);
+        if (!dir) {
+            applySelecting([{ row: startCell.row, col: startCell.col, el: getCell(startCell.row, startCell.col) }]);
+            return;
+        }
+        applySelecting(buildSelection(startCell.row, startCell.col, dir));
+    });
+
+    $(document).on('mouseup', function () {
+        if (!isDragging) return;
+        isDragging = false;
+        finishSelection();
+    });
+
+    /* ── Touch drag ── */
+    $table.on('touchstart', 'td.ws-grid-cell', function (e) {
+        e.preventDefault();
+        var r = parseInt($(this).data('row')), c = parseInt($(this).data('col'));
+        startCell = { row: r, col: c };
+        isDragging = true;
+        applySelecting([{ row: r, col: c, el: $(this) }]);
+    });
+
+    $table[0].addEventListener('touchmove', function (e) {
+        if (!isDragging || !startCell) return;
+        e.preventDefault();
+        var touch = e.touches[0];
+        var el = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (!el || !$(el).hasClass('ws-grid-cell')) return;
+        var r = parseInt($(el).data('row')), c = parseInt($(el).data('col'));
+        var dir = getDirection(startCell.row, startCell.col, r, c);
+        if (!dir) return;
+        applySelecting(buildSelection(startCell.row, startCell.col, dir));
+    }, { passive: false });
+
+    $(document).on('touchend', function () {
+        if (!isDragging) return;
+        isDragging = false;
+        finishSelection();
+    });
+
+    /* ── Match checking ── */
+    function finishSelection() {
+        if (currentSel.length < 2) { clearSelecting(); return; }
+
+        var word = currentSel.map(function (c) { return c.el.text().trim(); }).join('');
+        var rev  = word.split('').reverse().join('');
+
+        if (!tryMatch(word) && !tryMatch(rev)) {
+            // Flash invalid
+            currentSel.forEach(function (c) { c.el.addClass('invalid-flash'); });
+            setTimeout(function () {
+                $('.ws-grid-cell').removeClass('invalid-flash selecting');
+                currentSel = [];
+            }, 500);
+        }
+    }
+
+    function tryMatch(word) {
+        for (var i = 0; i < wordData.length; i++) {
+            var w = wordData[i];
+            if (!w.found && w.word === word) {
+                markFound(w);
+                return true;
             }
+        }
+        return false;
+    }
 
-            function highlightWord($wordItem) {
-                var startRow = parseInt($wordItem.data('start-row'));
-                var startCol = parseInt($wordItem.data('start-col'));
-                var direction = $wordItem.data('direction');
-                var length = parseInt($wordItem.data('length'));
-                var shifts = getShifts(direction);
-
-                for (var i = 0; i < length; i++) {
-                    var row = startRow + (i * shifts.row);
-                    var col = startCol + (i * shifts.col);
-                    $('td[data-row="' + row + '"][data-col="' + col + '"]').addClass('highlighted');
-                }
-
-                $wordItem.addClass('found');
-            }
-
-            function clearHighlights() {
-                $('.word-search-grid td').removeClass('highlighted');
-                $('.word-item').removeClass('found');
-            }
-
-            $('.word-item').click(function () {
-                highlightWord($(this));
-            });
-
-            $('#btnShowAll').click(function () {
-                clearHighlights();
-                $('.word-item').each(function () {
-                    highlightWord($(this));
-                });
-            });
-
-            $('#btnClearHighlights').click(function () {
-                clearHighlights();
-            });
+    function markFound(w) {
+        currentSel.forEach(function (c) {
+            c.el.removeClass('selecting invalid-flash').addClass('found-cell');
         });
-    </script>
+        currentSel = [];
+
+        $('[data-word-key="' + w.word + '"]').addClass('found-word');
+        w.found = true;
+
+        var count = wordData.filter(function (x) { return x.found; }).length;
+        $('#foundCount').text(count);
+
+        if (count === wordData.length) {
+            $('#celebrationBanner').css('display', 'block');
+        }
+    }
+
+    /* ── Hint button ── */
+    $(document).on('click', '.ws-hint-btn', function (e) {
+        e.stopPropagation();
+        var key = $(this).data('word-key');
+        var w = wordData.find(function (x) { return x.word === key; });
+        if (!w || w.found) return;
+
+        var shifts = dirShifts[w.direction];
+        if (!shifts) return;
+
+        for (var i = 0; i < w.length; i++) {
+            var r = w.startRow + i * shifts.dr;
+            var c = w.startCol + i * shifts.dc;
+            getCell(r, c).addClass('hint-flash');
+        }
+        setTimeout(function () { $('.ws-grid-cell').removeClass('hint-flash'); }, 2600);
+    });
+
+});
+</script>
 }

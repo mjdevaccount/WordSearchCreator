@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using WordSearch.Engine.Interface;
@@ -11,10 +11,9 @@ namespace WordSearch.Engine.Logic
         private readonly Random _random;
         public WordSearchGrid Grid { get; }
 
-        public WordSearchGenerator(WordSearchGrid grid) 
+        public WordSearchGenerator(WordSearchGrid grid)
             : this(grid, new Random())
         {
-            
         }
 
         public WordSearchGenerator(WordSearchGrid grid, Random random)
@@ -47,10 +46,8 @@ namespace WordSearch.Engine.Logic
                 return AddWordResult.Failed("Word has already been added");
 
             if (!TryPlaceWord(typedWord, forcedDirection))
-            {
                 return AddWordResult.Failed("Could not fit word in grid");
-            }
-            
+
             Grid.IncludedWords.Add(typedWord);
 
             return AddWordResult.Ok();
@@ -63,9 +60,7 @@ namespace WordSearch.Engine.Logic
                 for (int col = 0; col < Grid.Size; col++)
                 {
                     if (Grid.Grid[row, col] == WordSearchGrid.Empty)
-                    {
                         Grid.Grid[row, col] = WordSearchGrid.Letters[_random.Next(WordSearchGrid.Letters.Length)];
-                    }
                 }
             }
         }
@@ -79,9 +74,7 @@ namespace WordSearch.Engine.Logic
             bool allPlaced = words.All(word => AddWord(word).Success);
 
             if (allPlaced)
-            {
                 FillEmptySpaces();
-            }
 
             return allPlaced;
         }
@@ -89,12 +82,8 @@ namespace WordSearch.Engine.Logic
         private void ClearGrid()
         {
             for (int row = 0; row < Grid.Size; row++)
-            {
                 for (int col = 0; col < Grid.Size; col++)
-                {
                     Grid.Grid[row, col] = WordSearchGrid.Empty;
-                }
-            }
         }
 
         private bool TryPlaceWord(IncludedWord word, EDirection? forcedDirection)
@@ -107,13 +96,20 @@ namespace WordSearch.Engine.Logic
             {
                 List<(int Row, int Col)> validStarts = GetValidStartingPositions(word.Word, direction);
                 Shuffle(validStarts);
-                
+
                 foreach ((int Row, int Col) start in validStarts
                              .Where(start => CanPlace(word.Word, start, direction)))
                 {
                     Place(word.Word, start, direction);
                     word.StartPosition = start;
                     word.Direction = direction;
+
+                    var (rowShift, colShift) = GetShifts(direction);
+                    word.EndPosition = (
+                        start.Row + (word.Word.Length - 1) * rowShift,
+                        start.Col + (word.Word.Length - 1) * colShift
+                    );
+
                     return true;
                 }
             }
@@ -141,27 +137,35 @@ namespace WordSearch.Engine.Logic
 
         private List<EDirection> GetShuffledDirections()
         {
-            var baseList = new List<EDirection>
+            var all = new List<EDirection>
             {
-                EDirection.Horizonal,
-                EDirection.Vertical
+                EDirection.Horizontal,
+                EDirection.HorizontalReverse,
+                EDirection.Vertical,
+                EDirection.VerticalUp,
+                EDirection.DiagonalDownRight,
+                EDirection.DiagonalDownLeft,
+                EDirection.DiagonalUpRight,
+                EDirection.DiagonalUpLeft
             };
-            
-            Shuffle(baseList);
 
-            return baseList;
+            Shuffle(all);
+            return all;
         }
 
-        private (int RowShift, int ColShift) GetShifts(EDirection direction)
+        public static (int RowShift, int ColShift) GetShifts(EDirection direction)
         {
             switch (direction)
             {
-                case EDirection.Horizonal:
-                    return (0, 1);
-                case EDirection.Vertical:
-                    return (1, 0);
-                default:
-                    return (0, 1);
+                case EDirection.Horizontal:         return ( 0,  1);
+                case EDirection.HorizontalReverse:  return ( 0, -1);
+                case EDirection.Vertical:           return ( 1,  0);
+                case EDirection.VerticalUp:         return (-1,  0);
+                case EDirection.DiagonalDownRight:  return ( 1,  1);
+                case EDirection.DiagonalDownLeft:   return ( 1, -1);
+                case EDirection.DiagonalUpRight:    return (-1,  1);
+                case EDirection.DiagonalUpLeft:     return (-1, -1);
+                default:                            return ( 0,  1);
             }
         }
 
@@ -173,7 +177,6 @@ namespace WordSearch.Engine.Logic
             {
                 int row = start.Row + i * rowShift;
                 int col = start.Col + i * colShift;
-
                 Grid.Grid[row, col] = word[i];
             }
         }
@@ -183,22 +186,17 @@ namespace WordSearch.Engine.Logic
             var positions = new List<(int Row, int Col)>();
             var (rowShift, colShift) = GetShifts(direction);
 
-            int minRow = 0;
-            int maxRow = rowShift == 0
-                ? Grid.Size
-                : Grid.Size - word.Length + 1;
+            // For negative shift axes, the starting position must be far enough in that the
+            // word fits going in the negative direction without going out of bounds.
+            int minRow = rowShift < 0 ? word.Length - 1 : 0;
+            int maxRow = rowShift > 0 ? Grid.Size - word.Length + 1 : Grid.Size;
 
-            int maxCol = colShift == 0
-                ? Grid.Size
-                : Grid.Size - word.Length + 1;
+            int minCol = colShift < 0 ? word.Length - 1 : 0;
+            int maxCol = colShift > 0 ? Grid.Size - word.Length + 1 : Grid.Size;
 
             for (int row = minRow; row < maxRow; row++)
-            {
-                for (int col = 0; col < maxCol; col++)
-                {
+                for (int col = minCol; col < maxCol; col++)
                     positions.Add((row, col));
-                }
-            }
 
             return positions;
         }

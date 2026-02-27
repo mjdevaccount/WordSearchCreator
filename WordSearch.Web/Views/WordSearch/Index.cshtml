@@ -1,84 +1,284 @@
-﻿@{
-    ViewBag.Title = "Word Search Creator";
+@{
+    ViewBag.Title = "Build a Word Search";
 }
 
-<div class="container">
-    <h1>Word Search Creator</h1>
+<div class="ws-builder-page">
+    <!-- ══════════ SIDEBAR ══════════ -->
+    <div class="col-lg-3 col-md-4 ws-sidebar">
+        <div class="ws-sidebar-inner">
+            <a href="@Url.Action("Index", "Home")" class="ws-back-link">← Home</a>
+            <h2 class="ws-sidebar-title">Build Your Puzzle</h2>
 
-    <div class="row">
-        <div class="col-md-4">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Setup</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="form-group">
-                        <label for="gridSize">Grid Size</label>
-                        <input type="number" id="gridSize" class="form-control" min="5" max="20" value="10" />
+            <!-- Setup panel -->
+            <div class="ws-panel ws-panel-setup">
+                <div class="ws-panel-header"><span class="ws-panel-icon">⚙️</span> Grid Setup</div>
+                <div class="ws-panel-body">
+                    <label class="ws-label" for="gridSizeSlider">Grid Size</label>
+                    <div class="ws-size-row">
+                        <input type="range" id="gridSizeSlider" class="ws-range" min="5" max="25" value="12" />
+                        <span class="ws-size-badge" id="gridSizeDisplay">12×12</span>
                     </div>
-                    <button id="btnCreateGrid" class="btn btn-primary">Create Grid</button>
+                    <input type="hidden" id="gridSize" value="12" />
+                    <button id="btnCreateGrid" class="ws-btn ws-btn-primary w-100 mt-2">Create Grid</button>
                 </div>
             </div>
 
-            <div id="wordPanel" class="panel panel-default" style="display:none;">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Add Words</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="form-group">
-                        <label for="wordInput">Word</label>
-                        <input type="text" id="wordInput" class="form-control" />
+            <!-- Word-entry area (hidden until grid created) -->
+            <div id="wordPanel" style="display:none;">
+
+                <!-- Tab switcher -->
+                <ul class="ws-tabs">
+                    <li class="ws-tab active" data-tab="manual">Manual</li>
+                    <li class="ws-tab" data-tab="bulk">Bulk</li>
+                    <li class="ws-tab" data-tab="fetch">Fetch</li>
+                </ul>
+
+                <!-- Manual tab -->
+                <div class="ws-tab-content active" id="tab-manual">
+                    <div class="ws-panel">
+                        <div class="ws-panel-body">
+                            <label class="ws-label">Add a word</label>
+                            <div class="ws-input-group">
+                                <input type="text" id="wordInput" class="ws-input"
+                                       placeholder="e.g. TIGER"
+                                       autocomplete="off" autocapitalize="characters" />
+                                <button id="btnAddWord" class="ws-btn ws-btn-success">Add</button>
+                            </div>
+                            <div id="wordValidationMsg" class="ws-validation-msg" style="display:none;"></div>
+                        </div>
                     </div>
-                    <button id="btnAddWord" class="btn btn-success">Add Word</button>
-                    <button id="btnRebuild" class="btn btn-warning">Rebuild</button>
-                    <a href="@Url.Action("Solve", "WordSearch")" class="btn btn-info">Solve Mode</a>
+                </div>
+
+                <!-- Bulk tab -->
+                <div class="ws-tab-content" id="tab-bulk">
+                    <div class="ws-panel">
+                        <div class="ws-panel-body">
+                            <label class="ws-label">Paste words</label>
+                            <textarea id="bulkWords" class="ws-input ws-textarea"
+                                      placeholder="One per line, or comma/space separated&#10;e.g. LION, TIGER, BEAR"></textarea>
+                            <button id="btnAddBulk" class="ws-btn ws-btn-success w-100 mt-2">Add All</button>
+
+                            <div class="ws-divider">or upload a file</div>
+                            <label class="ws-file-label" for="wordFile">
+                                📁 Choose .txt file
+                                <input type="file" id="wordFile" accept=".txt" class="ws-file-input" />
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fetch tab -->
+                <div class="ws-tab-content" id="tab-fetch">
+                    <div class="ws-panel">
+                        <div class="ws-panel-body">
+                            <label class="ws-label">Topic</label>
+                            <input type="text" id="fetchTopic" class="ws-input" placeholder="e.g. animals, space, food" />
+
+                            <label class="ws-label mt-2">
+                                Count <span class="ws-size-badge" id="fetchCountDisplay">20</span>
+                            </label>
+                            <input type="range" id="fetchCount" class="ws-range" min="5" max="40" value="20" />
+
+                            <button id="btnFetch" class="ws-btn ws-btn-info w-100 mt-2">🔎 Fetch Words</button>
+
+                            <div id="fetchPreview" style="display:none;" class="mt-2">
+                                <div class="ws-fetch-preview-label">Preview – click to deselect</div>
+                                <div id="fetchWordTags" class="ws-fetch-tags"></div>
+                                <button id="btnAddFetched" class="ws-btn ws-btn-success w-100 mt-2">Add Selected</button>
+                            </div>
+                            <div id="fetchMsg" class="ws-validation-msg" style="display:none;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action row -->
+                <div class="ws-actions mt-3">
+                    <button id="btnRebuild" class="ws-btn ws-btn-warning flex-grow-1">🔀 Shuffle</button>
+                    <a href="@Url.Action("Solve", "WordSearch")" class="ws-btn ws-btn-accent flex-grow-1">▶ Solve</a>
                 </div>
             </div>
-            <div id="errorMessage" class="alert alert-danger" style="display:none; margin-top:10px;"></div>
+
+            <div id="errorMessage"   class="ws-alert ws-alert-danger  mt-2" style="display:none;"></div>
+            <div id="successMessage" class="ws-alert ws-alert-success mt-2" style="display:none;"></div>
         </div>
+    </div>
 
-        <div class="col-md-8">
-            <div id="gridContainer"></div>
+    <!-- ══════════ GRID AREA ══════════ -->
+    <div class="ws-grid-area" style="flex:1; overflow:auto;">
+        <div id="gridContainer" class="ws-grid-container">
+            <div class="ws-grid-placeholder">
+                <div class="ws-placeholder-inner">
+                    <div class="ws-placeholder-icon">🧩</div>
+                    <p>Set a grid size and click <strong>Create Grid</strong> to begin</p>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 @section scripts {
-    <script>
-        $(document).ready(function () {
-            $('#btnCreateGrid').click(function () {
-                var size = $('#gridSize').val();
-                $.post('@Url.Action("CreateGrid", "WordSearch")', { size: size }, function (response) {
-                    $('#gridContainer').html(response);
-                    $('#wordPanel').show();
-                    $('#errorMessage').hide();
-                });
-            });
-        });
+<script>
+$(function () {
 
-        $('#btnAddWord').click(function () {
-            var word = $('#wordInput').val();
-            $.post('@Url.Action("AddWord", "WordSearch")', { word: word }, function (response) {
-                if (response.success === false) {
-                    $('#errorMessage').text(response.message).show();
+    // --- Size slider ---
+    $('#gridSizeSlider').on('input', function () {
+        var v = $(this).val();
+        $('#gridSize').val(v);
+        $('#gridSizeDisplay').text(v + '×' + v);
+    });
+
+    // --- Fetch count slider ---
+    $('#fetchCount').on('input', function () {
+        $('#fetchCountDisplay').text($(this).val());
+    });
+
+    // --- Tab switching ---
+    $('.ws-tab').on('click', function () {
+        var tab = $(this).data('tab');
+        $('.ws-tab').removeClass('active');
+        $(this).addClass('active');
+        $('.ws-tab-content').removeClass('active');
+        $('#tab-' + tab).addClass('active');
+    });
+
+    // --- Create Grid ---
+    $('#btnCreateGrid').on('click', function () {
+        var $btn = $(this);
+        $btn.prop('disabled', true).text('Creating…');
+        $.post('@Url.Action("CreateGrid", "WordSearch")', { size: $('#gridSize').val() }, function (resp) {
+            $('#gridContainer').html(resp);
+            $('#wordPanel').show();
+            hideMessages();
+        }).always(function () { $btn.prop('disabled', false).text('Create Grid'); });
+    });
+
+    // --- Live word validation ---
+    var vTimer;
+    $('#wordInput').on('input', function () {
+        var word = $(this).val().trim();
+        var $msg = $('#wordValidationMsg');
+        clearTimeout(vTimer);
+        if (word.length < 2) { $msg.hide(); return; }
+        vTimer = setTimeout(function () {
+            $.post('@Url.Action("ValidateWord", "WordSearch")', { word: word }, function (r) {
+                if (!r.valid) {
+                    $msg.text(r.message).removeClass('ws-valid').addClass('ws-invalid').show();
+                } else if (r.exists) {
+                    $msg.text('Already in puzzle').removeClass('ws-valid').addClass('ws-invalid').show();
                 } else {
-                    $('#gridContainer').html(response);
-                    $('#wordInput').val('');
-                    $('#errorMessage').hide();
+                    $msg.hide();
                 }
             });
-        });
+        }, 300);
+    });
 
-        $('#btnRebuild').click(function () {
-            $.post('@Url.Action("Rebuild", "WordSearch")', function (response) {
-                if (response.success === false) {
-                    $('#errorMessage').text(response.message).show();
-                } else {
-                    $('#gridContainer').html(response);
-                    $('#errorMessage').hide();
-                }
+    $('#wordInput').on('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); doAddWord(); }
+    });
+
+    $('#btnAddWord').on('click', doAddWord);
+
+    function doAddWord() {
+        var word = $('#wordInput').val().trim();
+        if (!word) return;
+        $.post('@Url.Action("AddWord", "WordSearch")', { word: word }, function (resp) {
+            if (resp && resp.success === false) {
+                showError(resp.message);
+            } else {
+                $('#gridContainer').html(resp);
+                $('#wordInput').val('').focus();
+                $('#wordValidationMsg').hide();
+                hideMessages();
+            }
+        });
+    }
+
+    // --- Bulk words ---
+    $('#btnAddBulk').on('click', function () {
+        var text = $('#bulkWords').val();
+        if (!text.trim()) { showError('Please enter some words.'); return; }
+        addBulkWords(text, function () { $('#bulkWords').val(''); });
+    });
+
+    $('#wordFile').on('change', function () {
+        var file = this.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function (e) { $('#bulkWords').val(e.target.result); };
+        reader.readAsText(file);
+    });
+
+    function addBulkWords(text, onDone) {
+        $.post('@Url.Action("AddBulkWords", "WordSearch")', { wordsText: text }, function (r) {
+            if (r.success === false && !r.added) { showError(r.message); return; }
+            if (r.html) $('#gridContainer').html(r.html);
+            if (r.failed && r.failed.length)
+                showSuccess(r.message + ' Could not place: ' + r.failed.join(', '));
+            else
+                showSuccess(r.message);
+            if (onDone) onDone();
+        });
+    }
+
+    // --- Datamuse fetch ---
+    $('#btnFetch').on('click', function () {
+        var topic = $('#fetchTopic').val().trim();
+        if (!topic) { showError('Please enter a topic first.'); return; }
+        var $btn = $(this);
+        $btn.prop('disabled', true).text('Fetching…');
+        $('#fetchMsg').hide();
+
+        $.post('@Url.Action("FetchWords", "WordSearch")', { topic: topic, count: $('#fetchCount').val() }, function (r) {
+            if (!r.success) {
+                $('#fetchMsg').text(r.message).removeClass('ws-valid').addClass('ws-invalid').show();
+                $('#fetchPreview').hide();
+                return;
+            }
+            var $tags = $('#fetchWordTags').empty();
+            r.words.forEach(function (w) {
+                $('<span class="ws-fetch-tag active">').text(w).on('click', function () {
+                    $(this).toggleClass('active');
+                }).appendTo($tags);
             });
-        });
+            $('#fetchPreview').show();
+        }).fail(function () {
+            $('#fetchMsg').text('Network error. Try again.').addClass('ws-invalid').show();
+        }).always(function () { $btn.prop('disabled', false).text('🔎 Fetch Words'); });
+    });
 
-    </script>
+    $('#btnAddFetched').on('click', function () {
+        var selected = $('#fetchWordTags .ws-fetch-tag.active').map(function () {
+            return $(this).text();
+        }).get();
+        if (!selected.length) { showError('No words selected.'); return; }
+        addBulkWords(selected.join('\n'), function () {
+            $('#fetchPreview').hide();
+            $('#fetchWordTags').empty();
+        });
+    });
+
+    // --- Rebuild ---
+    $('#btnRebuild').on('click', function () {
+        $.post('@Url.Action("Rebuild", "WordSearch")', function (resp) {
+            if (resp && resp.success === false) showError(resp.message);
+            else { $('#gridContainer').html(resp); hideMessages(); }
+        });
+    });
+
+    // --- Helpers ---
+    function showError(msg) {
+        $('#successMessage').hide();
+        $('#errorMessage').text(msg).show();
+    }
+    function showSuccess(msg) {
+        $('#errorMessage').hide();
+        $('#successMessage').text(msg).show();
+        setTimeout(function () { $('#successMessage').fadeOut(); }, 4500);
+    }
+    function hideMessages() {
+        $('#errorMessage').hide();
+        $('#successMessage').hide();
+    }
+});
+</script>
 }

@@ -1,0 +1,96 @@
+@{
+    ViewBag.Title = "Word Search Creator";
+}
+
+<div class="ws-hero">
+    <div class="container">
+        <div class="ws-hero-inner">
+            <div class="ws-hero-text">
+                <h1 class="ws-hero-title">
+                    <span class="ws-letter ws-letter-1">W</span><span class="ws-letter ws-letter-2">O</span><span class="ws-letter ws-letter-3">R</span><span class="ws-letter ws-letter-4">D</span>
+                    <span class="ws-letter-space"> </span>
+                    <span class="ws-letter ws-letter-5">S</span><span class="ws-letter ws-letter-6">E</span><span class="ws-letter ws-letter-7">A</span><span class="ws-letter ws-letter-8">R</span><span class="ws-letter ws-letter-9">C</span><span class="ws-letter ws-letter-10">H</span>
+                </h1>
+                <p class="ws-hero-sub">Build puzzles. Challenge friends. Find every word.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container ws-main-content">
+    <div class="row justify-content-center g-4 ws-cards-row">
+        <div class="col-md-5">
+            <a href="@Url.Action("Index", "WordSearch")" class="ws-card ws-card-build text-decoration-none">
+                <div class="ws-card-accent ws-accent-purple"></div>
+                <div class="ws-card-body">
+                    <div class="ws-card-icon">✏️</div>
+                    <h2 class="ws-card-title">Build a Puzzle</h2>
+                    <p class="ws-card-desc">
+                        Create your own word search from scratch. Type words one by one,
+                        paste a list, or pull themed words automatically. Choose your grid size
+                        and let the engine do the rest.
+                    </p>
+                    <div class="ws-card-features">
+                        <span class="ws-feature-tag">All 8 directions</span>
+                        <span class="ws-feature-tag">Bulk import</span>
+                        <span class="ws-feature-tag">Datamuse words</span>
+                    </div>
+                    <div class="ws-card-cta">Start Building →</div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-5">
+            <div class="ws-card ws-card-solve ws-card-disabled">
+                <div class="ws-card-accent ws-accent-coral"></div>
+                <div class="ws-card-body">
+                    <div class="ws-card-icon">🔍</div>
+                    <h2 class="ws-card-title">Solve a Puzzle</h2>
+                    <p class="ws-card-desc">
+                        Jump straight into solving mode on a puzzle you've already built.
+                        Drag to select words, earn hints, and race the clock.
+                    </p>
+                    <div class="ws-card-features">
+                        <span class="ws-feature-tag">Drag to select</span>
+                        <span class="ws-feature-tag">Smart hints</span>
+                        <span class="ws-feature-tag">Progress tracking</span>
+                    </div>
+                    <div class="ws-card-cta ws-cta-muted">Build a puzzle first →</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ws-how-it-works">
+        <h3 class="ws-section-title">How it works</h3>
+        <div class="row g-3 justify-content-center">
+            <div class="col-md-3">
+                <div class="ws-step">
+                    <div class="ws-step-num">1</div>
+                    <div class="ws-step-text">
+                        <strong>Pick a size</strong>
+                        <span>Set your grid from 5×5 to 25×25</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="ws-step">
+                    <div class="ws-step-num">2</div>
+                    <div class="ws-step-text">
+                        <strong>Add words</strong>
+                        <span>Type, paste, upload, or fetch themed words</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="ws-step">
+                    <div class="ws-step-num">3</div>
+                    <div class="ws-step-text">
+                        <strong>Play!</strong>
+                        <span>Switch to solve mode and find them all</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,19 +1,23 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - Word Search Creator</title>
+    <title>@ViewBag.Title - Word Search</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
 </head>
 <body>
-<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark">
-    <div class="container">
-        @Html.ActionLink("Word Search Creator", "Index", "WordSearch", new { area = "" }, new { @class = "navbar-brand" })
+<nav class="ws-navbar navbar navbar-expand-sm">
+    <div class="container-fluid px-4">
+        @Html.ActionLink("🔤 Word Search", "Index", "Home", new { area = "" }, new { @class = "navbar-brand ws-brand" })
+        <div class="ms-auto ws-nav-links">
+            @Html.ActionLink("Build", "Index", "WordSearch", null, new { @class = "ws-nav-link" })
+        </div>
     </div>
 </nav>
-<div class="container body-content">
+<div class="ws-page-body">
     @RenderBody()
 </div>
 @Scripts.Render("~/bundles/jquery")

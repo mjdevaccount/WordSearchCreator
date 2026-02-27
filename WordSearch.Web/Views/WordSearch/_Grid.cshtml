@@ -1,44 +1,35 @@
-﻿
 @using WordSearch.Engine.Models
 @model WordSearch.Engine.Models.WordSearchGrid
 
-<div class="row">
-    <div class="col-md-8">
-        <table class="word-search-grid">
+<div class="ws-grid-wrapper">
+    <div>
+        <table class="ws-puzzle-grid">
             @for (int row = 0; row < Model.Size; row++)
             {
                 <tr>
                     @for (int col = 0; col < Model.Size; col++)
                     {
                         var cell = Model.Grid[row, col];
-                        var display = cell == WordSearchGrid.Empty ? '·' : cell;
-                        <td>@display</td>
+                        if (cell == WordSearchGrid.Empty)
+                        {
+                            <td class="ws-empty">·</td>
+                        }
+                        else
+                        {
+                            <td>@cell</td>
+                        }
                     }
                 </tr>
             }
         </table>
     </div>
-    <div class="col-md-4">
-        <h4>Words</h4>
-        <ul class="list-group">
+    <div class="ws-word-list-panel">
+        <div class="ws-word-list-title">Words (@Model.IncludedWords.Count)</div>
+        <div>
             @foreach (var word in Model.IncludedWords)
             {
-                <li class="list-group-item">@word.Word</li>
+                <span class="ws-word-pill">@word.Word</span>
             }
-        </ul>
+        </div>
     </div>
 </div>
-
-<style>
-    .word-search-grid {
-        border-collapse: collapse;
-        font-family: monospace;
-        font-size: 18px;
-    }
-    .word-search-grid td {
-        width: 30px;
-        height: 30px;
-        text-align: center;
-        border: 1px solid #ccc;
-    }
-</style>
